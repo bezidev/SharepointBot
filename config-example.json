@@ -1,0 +1,1 @@
+{"database_name":"sqlite3","database_config":"database/database.sqlite3","debug":true,"ms_oauth2_client_id":"","ms_oauth2_secret":"","ms_oauth2_refresh_token":"","webhooks":["https://discord.com/api/webhooks/channelId/botToken"]}
