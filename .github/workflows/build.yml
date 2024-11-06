@@ -3,31 +3,8 @@ on:
   - push
 
 jobs:
-  build-linux:
-    name: Linux build
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-go@v5
-        with:
-          go-version: '^1.23'
-      - name: Get current Go version
-        run: go version
-      - name: Get Go dependencies
-        run: go mod download
-      - name: Set env
-        run: go env -w GOFLAGS=-mod=mod
-      - name: Go get
-        run: go get -v .
-      - name: Build app
-        run: go build -v -o backend main.go
-      - uses: actions/upload-artifact@v4
-        with:
-          name: backend-linux
-          path: backend
   docker:
     name: Docker build
-    needs: build-linux
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
     steps:
