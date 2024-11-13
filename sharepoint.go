@@ -12,6 +12,8 @@ import (
 	"github.com/imroc/req/v3"
 	"net/http"
 	"os"
+	"regexp"
+	"strings"
 	"time"
 )
 
@@ -359,15 +361,15 @@ func (server *httpImpl) GetSharepointNotificationsGoroutine(accessToken string) 
 			}
 
 			// ker discord je pač retarded
-			r := regexp.MustCompile(`\[(?P<URL>.*)\]\(.*\)`, -1)
-    		res := r.FindAllStringSubmatch(markdown)
+			r := regexp.MustCompile(`\[(?P<URL>.*)\]\(.*\)`)
+			res := r.FindAllStringSubmatch(markdown, -1)
 			for _, l := range res {
 				if len(l) < 2 {
 					continue
 				}
 				markdown = strings.ReplaceAll(markdown, l[0], l[1])
 			}
-			
+
 			notificationResponse.Fields.Body = markdown
 
 			expires := int(notificationResponse.Fields.Expires.Unix())
