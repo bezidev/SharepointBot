@@ -243,17 +243,17 @@ func (server *httpImpl) SendNotificationToWebhook(webhook string, editing bool, 
 				Fields: []EmbedField{
 					{
 						Name:   "Ustvarjeno",
-						Value:  created,
+						Value:  fmt.Sprintf("`%s`", created),
 						Inline: true,
 					},
 					{
 						Name:   "Nazadnje spremenjeno",
-						Value:  modified,
+						Value:  fmt.Sprintf("`%s`", modified),
 						Inline: true,
 					},
 					{
 						Name:   "Nazadnje spremenil",
-						Value:  notification.ModifiedBy,
+						Value:  fmt.Sprintf("`%s`", notification.ModifiedBy),
 						Inline: true,
 					},
 				},
@@ -345,15 +345,29 @@ func (server *httpImpl) GetSharepointNotificationsGoroutine(accessToken string) 
 				break
 			}
 
-			opt := &md.Options{
-				LinkStyle: "referenced",
+			// ne posodabljaj za vsak drek
+			if noterr != nil || int(notificationResponse.Fields.Modified.Unix()) != notificationDb.ModifiedOn {
+				continue
 			}
+
+			opt := &md.Options{}
 			converter := md.NewConverter("", true, opt)
 			markdown, err := converter.ConvertString(notificationResponse.Fields.Body)
 			if err != nil {
 				server.logger.Errorw("error parsing Sharepoint HTML", "err", err)
 				break
 			}
+
+			// ker discord je pač retarded
+			r := regexp.MustCompile(`\[(?P<URL>.*)\]\(.*\)`, -1)
+    		res := r.FindAllStringSubmatch(markdown)
+			for _, l := range res {
+				if len(l) < 2 {
+					continue
+				}
+				markdown = strings.ReplaceAll(markdown, l[0], l[1])
+			}
+			
 			notificationResponse.Fields.Body = markdown
 
 			expires := int(notificationResponse.Fields.Expires.Unix())
