@@ -348,7 +348,7 @@ func (server *httpImpl) GetSharepointNotificationsGoroutine(accessToken string) 
 			}
 
 			// ne posodabljaj za vsak drek
-			if noterr != nil || int(notificationResponse.Fields.Modified.Unix()) != notificationDb.ModifiedOn {
+			if noterr == nil && int(notificationResponse.Fields.Modified.Unix()) == notificationDb.ModifiedOn {
 				continue
 			}
 
@@ -361,7 +361,7 @@ func (server *httpImpl) GetSharepointNotificationsGoroutine(accessToken string) 
 			}
 
 			// ker discord je pač retarded
-			r := regexp.MustCompile(`\[(?P<URL>.*)\]\(.*\)`)
+			r := regexp.MustCompile(`\[(?P<URL>.*)]\(.*\)`)
 			res := r.FindAllStringSubmatch(markdown, -1)
 			for _, l := range res {
 				if len(l) < 2 {
