@@ -247,7 +247,7 @@ func (server *httpImpl) SendNotificationToWebhook(webhook string, editing bool, 
 					IconURL string `json:"icon_url"`
 				}{Name: notification.CreatedBy, URL: "", IconURL: ""},
 				Title:       notification.Name,
-				Description: notification.Description,
+				Description: description,
 				Color:       15258703,
 				URL:         fmt.Sprintf("https://gimnazijabezigrad.sharepoint.com/Lists/ObvAkt/DispForm.aspx?ID=%s", notification.ID),
 				Fields: []EmbedField{
