@@ -227,6 +227,14 @@ func (server *httpImpl) SendNotificationToWebhook(webhook string, editing bool, 
 	modifiedOn := time.Unix(int64(notification.ModifiedOn), 0)
 	modified := modifiedOn.Format("02. 01. 2006 ob 15.04")
 
+	description := notification.Description
+	if notification.HasAttachments {
+		if description != "" {
+			description += "\n\n"
+		}
+		description += "**Obvestilo ima priponke.**"
+	}
+
 	body := WebhookBody{
 		Username:  "Intranet",
 		AvatarURL: "",
@@ -328,6 +336,7 @@ func (server *httpImpl) GetSharepointNotificationsGoroutine(accessToken string) 
 		for _, v := range response.Value {
 			notificationDb, noterr := server.db.GetSharepointNotification(v.Id)
 			if (noterr == nil && notificationDb.ModifiedOn == int(v.LastModifiedDateTime.Unix())) || (noterr != nil && !errors.Is(noterr, sql.ErrNoRows)) {
+				// TODO: preveri, kaj to sranje dela?
 				if err != nil {
 					server.logger.Errorw("error retrieving Sharepoint notification", "id", v.Id, "webUrl", v.WebUrl, "err", err)
 				}
@@ -422,6 +431,7 @@ func (server *httpImpl) GetSharepointNotificationsGoroutine(accessToken string) 
 				notificationDb.ExpiresOn = expires
 				notificationDb.Name = notificationResponse.Fields.Title
 				notificationDb.Description = notificationResponse.Fields.Body
+				notificationDb.HasAttachments = notificationResponse.Fields.Attachments
 
 				err := server.db.UpdateSharepointNotification(notificationDb)
 				if err != nil {
