@@ -232,7 +232,7 @@ func (server *httpImpl) SendNotificationToWebhook(webhook string, editing bool, 
 		if description != "" {
 			description += "\n\n"
 		}
-		description += "**Obvestilo ima priponke.**"
+		description += "*Obvestilo ima priponke.*"
 	}
 
 	body := WebhookBody{
